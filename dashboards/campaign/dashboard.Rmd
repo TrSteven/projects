@@ -1,0 +1,52 @@
+---
+title: "Data analysis of donations between 2005 and 2008"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(knitr)
+
+source("analysis.R")
+```
+
+Row {.tabset}
+-----------------------------------------------------------------------
+
+### Evolution of total of donations per campaign and per year
+
+```{r}
+ggplotly(plot_aggr_date_campaign, tooltip = c("text"))
+```
+
+### Evolution of the average amount per donation
+
+```{r}
+ggplotly(plot_date_campaign_smooth, tooltip = c("y"))
+```
+
+### Total donations per gender and per campaign
+
+```{r}
+ggplotly(plot_gen_camp, tooltip = c("text")) %>% layout(margin=list(l=100, r=20, b=100, t=20))
+```
+
+Row 
+-----------------------------------------------------------------------
+
+### Top 20 donors
+
+```{r}
+kable(top_20_donors, caption = "Top 20 donors", align = 'c')
+```
+
+### Gender of donors
+
+```{r}
+plot_ly(aggr_gender, labels = ~gender, values = ~count, type = 'pie') %>% 
+  layout(title = "Donors by Gender",  showlegend = TRUE)
+```
+
