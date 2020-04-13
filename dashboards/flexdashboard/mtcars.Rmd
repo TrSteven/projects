@@ -1,0 +1,109 @@
+---
+title: "Mtcars dataset"
+output: 
+  flexdashboard::flex_dashboard:
+    theme: spacelab
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(crosstalk)
+library(plotly)
+library(ggplot2)
+library(tidyverse)
+library(htmltools)
+```
+
+```{r, include=FALSE}
+shared_mtcars <- SharedData$new(mtcars)
+```
+
+Plotly with crosstalk filters
+=====================================
+
+
+Inputs {.sidebar}
+-----------------------------------------------------------------------
+
+This is a dashboard created with R Markdown, flexdashboard, plotly and crosstalk.
+
+### Filters
+
+```{r}
+div(
+  style = css(width="100%", height = "200px"),
+  list(
+  filter_checkbox("cyl", "Cylinders", shared_mtcars, ~cyl, inline = TRUE),
+  filter_slider("hp", "Horsepower", shared_mtcars, ~hp, width = "100%"),
+  filter_select("auto", "Automatic", shared_mtcars, ~ifelse(am == 0, "Yes", "No")))
+)
+
+```
+
+Column {.tabset}  
+-----------------------------------------------------------------------
+
+### Miles per Gallon vs. Weight
+
+```{r}
+plot_ly(data = shared_mtcars, x = ~wt, y = ~mpg, color = ~factor(cyl)) %>%
+  layout(xaxis = list(title = "Weight"), yaxis = list(title = "Miles per gallon"))
+```
+
+### Quarter mile time vs. Weight
+
+```{r}
+plot_ly(data = shared_mtcars, x = ~wt, y = ~qsec, color = ~factor(cyl)) %>%
+  layout(xaxis = list(title = "Weight"), yaxis = list(title = "Quarter mile time"))
+```
+
+GGPlot
+=====================================
+
+Column {.tabset} 
+-------------------------------------
+    
+### Linear regression
+    
+```{r}
+p <- ggplot(mtcars, aes(hp, mpg)) + geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +
+  ylab("Miles per Gallon") +
+  xlab("No. of Horsepower") +
+  ggtitle("Impact of Number of Horsepower on MPG")
+ggplotly(p)
+```
+
+### Smoothing
+    
+```{r}
+p <- ggplot(mtcars, aes(hp, mpg)) +
+  stat_smooth() + geom_point() +
+  ylab("Miles per Gallon") +
+  xlab ("No. of Horsepower") +
+  ggtitle("Impact of Number of Horsepower on MPG")
+ggplotly(p)
+```
+
+Column
+-------------------------------------
+   
+### Histogram weight
+
+```{r}
+p <- ggplot(mtcars, aes(wt)) +
+  geom_histogram(binwidth = 0.5) + xlab('Weight') + ylab('Number of Cars') +
+  ggtitle('Distribution of Cars by Weight')
+ggplotly(p)
+```   
+ 
+### Barplot cylinders
+    
+```{r}
+p <- mtcars %>% group_by(cyl) %>% tally() %>% 
+  ggplot(aes(x = cyl, y = n)) +
+  geom_bar(stat="identity") + xlab('Cylinders') + ylab('Number of Cars') +
+  ggtitle('Distribution of Cars by Cylinders')
+ggplotly(p)
+```
+
