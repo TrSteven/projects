@@ -1,0 +1,2 @@
+https://archive.ics.uci.edu/ml/datasets/Student+Performance
+http://www3.dsi.uminho.pt/pcortez/student.pdf
